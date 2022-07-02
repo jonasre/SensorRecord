@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">SensorRecord</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="no_sensor_error">You can\'t use SensorRecord on this device because you don\'t have any of the required sensors.</string>
+    <string name="help">Help</string>
+    <string name="help_text"><![CDATA[
+        <h1>Documentation</h1>
+        This page explains how to use SensorRecord.
+        <h2>Recording sensor data</h2>
+        <i>Please follow the instructions below.</i>
+        <ul>
+            <li>Set a fitting title for your trip, so that it\'s easier to find later</li>
+            <li>Press <b>Start recording</b> when you are seated in the aircraft</li>
+            <li>Press <b>Add marker</b> for each of these events:\n
+                <ul>
+                    <li>Pushback (the aircraft leaves the gate)</li>
+                    <li>Taxi (the aircraft starts driving toward the runway using its own engines. This happens after the aircraft has been stationary for a short while after pushback)</li>
+                    <li>Takeoff (when the aircraft is on the runway and you hear the engines increase power, i.e., not when the aircraft lifts off, but when it starts accelerating)</li>
+                    <li>Landing (the second the aircraft touches the ground again)</li>
+                    <li>Park (when the aircraft stops at the gate)</li>
+                </ul>
+            </li>
+            <li>Press <b>Stop recording</b> when you exit the aircraft\n</li>
+        </ul>
+
+
+        <b>Add marker</b> opens a dialog requesting a title and a confirmation (OK/Cancel). The timestamp is saved when <b>Add marker</b> is pressed, not when <b>OK</b> is pressed.
+        Therefore, please press <b>Add marker</b> at the exact moment one of the listed events happen (takeoff, landing, etc.).
+
+        <br><br>
+
+        The app runs in the background, so you don\'t need to have it open except when you\'re adding a marker. It also displays a notification while running that, if pressed, opens the app for you.
+
+        <br><br>
+
+        Have a nice trip!
+
+        <h2>After your trip</h2>
+        <i>Depending on the length of your recording, processing the data might take up to a minute. Please be patient.</i>
+        <ul>
+            <li>Open the navigation drawer of the app by pressing the hamburger menu button in the <b>top left corner</b></li>
+            <li>Select <b>History</b></li>
+            <li>Click on your recording (listed as <i>your_title.zip</i>)</li>
+            <li>Use your preferred platform to share the file</li>
+        </ul>
+
+        <br>
+
+        <b>Thank you!</b>
+
+]]>
+
+    </string>
+</resources>
