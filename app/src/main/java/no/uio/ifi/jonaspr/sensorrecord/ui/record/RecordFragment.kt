@@ -9,6 +9,8 @@ import android.content.Intent
 import android.hardware.Sensor
 import android.os.Bundle
 import android.os.SystemClock
+import android.text.Editable
+import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -55,13 +57,14 @@ class RecordFragment : Fragment() {
         }
 
         _binding!!.startButton.setOnClickListener {
-            Log.d(TAG, "Button click, service == null -> ${service == null}")
             if (service == null) {
                 val title = _binding!!.titleInput.text.toString()
-                val ret = recordViewModel.startRecordingService(context, title)
-                if (ret) {
-                    it.isEnabled = false
-                } else {
+                if (title.isBlank()) {
+                    _binding!!.titleInput.error = getString(R.string.set_title)
+                    return@setOnClickListener
+                }
+                val serviceStarted = recordViewModel.startRecordingService(context, title)
+                if (!serviceStarted) {
                     val builder: AlertDialog.Builder? = activity?.let { fragment ->
                         AlertDialog.Builder(fragment)
                     }
@@ -137,11 +140,18 @@ class RecordFragment : Fragment() {
                     val text = "$it hPa"
                     _binding!!.captureCount.text = text
                 }
+
+                // Set the title text in case the app has restarted
+                _binding!!.titleInput.text = SpannableStringBuilder(service!!.getDataObject().title)
+
                 // Observe service running or not (running = true, stopped = false)
                 service!!.running().observe(viewLifecycleOwner) {
-                    _binding!!.startButton.isVisible = !it
-                    _binding!!.stopButton.isVisible = it
-                    _binding!!.markerButton.isVisible = it
+                    _binding?.apply {
+                        startButton.isVisible = !it
+                        stopButton.isVisible = it
+                        markerButton.isVisible = it
+                        titleInput.isEnabled = !it
+                    }
                 }
             }
             _binding!!.startButton.isEnabled = true
