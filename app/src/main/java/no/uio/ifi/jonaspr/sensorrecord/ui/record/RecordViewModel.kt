@@ -30,16 +30,26 @@ class RecordViewModel : ViewModel() {
 
     }
 
+    // Verifies that sensors are available, starts the recording service
+    // Returns true if service started, false if not (sensors unavailable)
     fun startRecordingService(context: Context?, title: String) : Boolean {
         val accelerometer = hasSensor(context, Sensor.TYPE_ACCELEROMETER)
         val barometer = hasSensor(context, Sensor.TYPE_PRESSURE)
+
+        // If accelerometer or barometer is available
         if (accelerometer || barometer) {
-            val intent = Intent(context, RecordService::class.java)
-            intent.putExtra("title", title)
-            intent.putExtra("accelerometer", accelerometer)
-            intent.putExtra("barometer", barometer)
+            val intent = Intent(context, RecordService::class.java).apply {
+                putExtra("title", title)
+                putExtra("accelerometer", accelerometer)
+                putExtra("barometer", barometer)
+            }
+
+            // Start the recording service
             context?.applicationContext?.startForegroundService(intent)
+
+            // Bind the service
             bindService(context, intent)
+
             return true
         }
         return false
