@@ -134,7 +134,6 @@ class RecordFragment : Fragment() {
             if (binder != null) {
                 service = binder.getService()
                 service!!.pressure().observe(viewLifecycleOwner) {
-                    _binding!!.captureCount.visibility = View.VISIBLE
                     val text = "$it hPa"
                     _binding!!.captureCount.text = text
                 }
