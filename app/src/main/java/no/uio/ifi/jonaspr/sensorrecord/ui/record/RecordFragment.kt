@@ -15,9 +15,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import androidx.core.view.isVisible
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import no.uio.ifi.jonaspr.sensorrecord.R
@@ -100,23 +100,49 @@ class RecordFragment : Fragment() {
             val dataObject = service?.getDataObject()
             val timestamp = SystemClock.elapsedRealtimeNanos() / 1_000_000
             val timestampReadable = System.currentTimeMillis()
-            var dialog: AlertDialog? = null
 
             if (dataObject == null) return@setOnClickListener
 
-            // Create dialog
+            // Create dialog builder
             val builder: AlertDialog.Builder? = activity?.let {
                 AlertDialog.Builder(it)
             }
-            val dateFormat = DateFormat.getTimeInstance()
 
-            builder?.setView(R.layout.dialog_add_marker)?.apply {
+            val dateFormat = DateFormat.getTimeInstance()
+            val view = activity?.layoutInflater?.inflate(R.layout.dialog_add_marker, null)
+
+            // Get elements
+            val spinner = view?.findViewById<Spinner>(R.id.markerSpinner)!!
+            val textField = view.findViewById<EditText>(R.id.markerName)
+
+            // Build dialog
+            builder?.setView(view)?.apply {
                 setTitle("Add marker at ${dateFormat.format(timestampReadable)}")
+
+                spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?,
+                                                pos: Int, id: Long) {
+                        textField.visibility =
+                            if (pos == spinner.count-1) View.VISIBLE else View.GONE
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
+                if (service != null) spinner.setSelection(service!!.currentMarkerIndex)
 
                 setPositiveButton("Ok") { _, _ ->
                     Log.d(TAG, "Dialog OK")
-                    val name = dialog?.findViewById<EditText>(R.id.markerName)?.text.toString().trim()
+                    var name = spinner.selectedItem.toString()
+
+                    // If custom is selected
+                    if (spinner.selectedItemPosition == spinner.adapter.count-1) {
+                        name = textField.text.toString().trim()
+                    } else {
+                        service?.currentMarkerIndex = spinner.selectedItemPosition + 1
+                    }
+
+                    // Add the marker
                     dataObject.addMarker(name, timestamp)
+                    // Notify user of successful creation of marker
                     Toast.makeText(
                         this@RecordFragment.context,
                         "Marker '$name' has been saved",
@@ -128,8 +154,7 @@ class RecordFragment : Fragment() {
 
             }
             Log.d(TAG, "Creating dialog, builder: $builder")
-            dialog = builder?.show()
-
+            builder?.show()
         }
 
         recordViewModel.binder().observe(viewLifecycleOwner) { binder ->

@@ -51,6 +51,8 @@ class RecordService : Service() {
     fun running(): LiveData<Boolean> = _running
     fun pressure(): LiveData<Float> = _pressure
 
+    var currentMarkerIndex = 0
+
 
     override fun onBind(intent: Intent): IBinder {
         return binder

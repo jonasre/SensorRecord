@@ -55,10 +55,15 @@
 
         <br>
 
-        <b>Thank you!</b>
-
-]]>
-
+        <b>Thank you!</b>]]>
     </string>
     <string name="set_title">Please set a title</string>
+    <string-array name="markers">
+        <item>Pushback</item>
+        <item>Taxi</item>
+        <item>Takeoff</item>
+        <item>Landing</item>
+        <item>Park</item>
+        <item>Custom</item>
+    </string-array>
 </resources>
