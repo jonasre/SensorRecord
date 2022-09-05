@@ -6,7 +6,6 @@ import android.content.Intent
 import android.app.AlarmManager
 import android.app.AlarmManager.RTC_WAKEUP
 import android.hardware.Sensor
-import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Binder
 import android.os.IBinder
@@ -36,16 +35,15 @@ class RecordService : Service() {
 
 
     private lateinit var job : Job
-    private lateinit var sensorManager : SensorManagerInterface
-    private lateinit var listener : SensorEventListener
+    private lateinit var sensorManager : SensorManager
+    private lateinit var listener : CustomSensorEventListener
     private lateinit var dataObject : SensorRecording
     private lateinit var alarmManager : AlarmManager
     private lateinit var pendingIntent : PendingIntent
     private lateinit var wakeLock : PowerManager.WakeLock
 
-    private var injectSensorData: Boolean = false
     private var useAccelerometer: Boolean = true
-    private var useBarometer: Boolean = true
+    var useBarometer: Boolean = true
 
 
     private val _running = MutableLiveData(false)
@@ -65,17 +63,8 @@ class RecordService : Service() {
         val title = intent?.getStringExtra("title") as String
         useAccelerometer = intent.getBooleanExtra("accelerometer", true)
         useBarometer = intent.getBooleanExtra("barometer", true)
-        injectSensorData = intent.getBooleanExtra("injectSensorData", false)
         dataObject = SensorRecording(title, delay)
-
-        // Use CustomSensorManager if sensor data should be injected,
-        // else use default SensorManager
-        sensorManager = if (injectSensorData) {
-            CustomSensorManager()
-        } else {
-            SensorManagerWrapper(getSystemService(Context.SENSOR_SERVICE) as SensorManager)
-        }
-
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         job = CoroutineScope(Dispatchers.Default).launch {
             // Set up sensor listening
             listener = CustomSensorEventListener(dataObject, _pressure)
@@ -92,6 +81,7 @@ class RecordService : Service() {
                     maxReportLatency
                 )
                 Log.d(TAG, "MaxReportLatency for barometer: $maxReportLatency")
+                Log.d(TAG, "Barometer is wakeupSensor: ${pressureSensor.isWakeUpSensor}")
                 // Log if batching isn't available
                 if (!barometerBatching)
                     Log.w(TAG, "Batching for barometer not available")
@@ -109,6 +99,7 @@ class RecordService : Service() {
                     maxReportLatency
                 )
                 Log.d(TAG, "MaxReportLatency for accelerometer: $maxReportLatency")
+                Log.d(TAG, "Accelerometer is wakeupSensor: ${accelerometer.isWakeUpSensor}")
                 // Log if batching isn't available
                 if (!accelerometerBatching)
                     Log.w(TAG, "Batching for accelerometer not available")
