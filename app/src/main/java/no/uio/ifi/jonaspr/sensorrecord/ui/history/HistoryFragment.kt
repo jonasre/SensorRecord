@@ -29,8 +29,7 @@ class HistoryFragment : Fragment() {
         val root: View = binding.root
 
 
-        val allFiles = Storage.getAllZipFiles()
-        allFiles.reverse()
+        val allFiles = Storage.getAllZipFiles().asReversed()
         _binding!!.fileList.adapter = HistoryListAdapter(allFiles)
         _binding!!.fileList
             .addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))

@@ -9,6 +9,7 @@ import java.util.zip.ZipOutputStream
 object Storage {
     private const val TAG = "STORAGE"
     private lateinit var path : File
+    private val UNITS = arrayOf("B", "kB", "MB", "GB", "TB")
 
     fun initialize(context: Context) {
         path = context.applicationContext.filesDir
@@ -98,15 +99,25 @@ object Storage {
         writer.close()
     }*/
 
-    fun getAllZipFiles(): Array<String> {
+    fun getAllZipFiles(): List<File> {
         Log.d(TAG, "Getting all files from directory")
-        val file = File(path.toString())
-        val fileList = file.list()?.filter {
+        val parent = File(path.toString())
+        val fileList = parent.list()?.filter {
             it.split(".").last() == "zip" && it.split(".").size > 1
         }
         Log.d(TAG, "Found ${fileList?.size} files")
 
-        return fileList?.toTypedArray()!!
+        return fileList?.map { File(parent, it) }!!
+    }
+
+    fun sizeBytesPrettyString(bytes: Long) : String {
+        var asDouble = bytes.toDouble()
+        var unitIndex = 0
+        while (asDouble > 1024) {
+            asDouble /= 1024
+            unitIndex++
+        }
+        return "${String.format("%.2f", asDouble)} ${UNITS[unitIndex]}"
     }
 
 

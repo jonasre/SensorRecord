@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
+import no.uio.ifi.jonaspr.sensorrecord.data.Storage
 import no.uio.ifi.jonaspr.sensorrecord.databinding.HistoryItemBinding
 import java.io.File
+import java.text.SimpleDateFormat
 import java.util.*
 
-class HistoryListAdapter(private val fileList: Array<String>) :
+class HistoryListAdapter(private val fileList: List<File>) :
     RecyclerView.Adapter<HistoryListAdapter.ViewHolder>() {
 
     /**
@@ -20,28 +22,18 @@ class HistoryListAdapter(private val fileList: Array<String>) :
     inner class ViewHolder(binding: HistoryItemBinding) : RecyclerView.ViewHolder(binding.root) {
         private val titleText = binding.titleText
         private val dateText = binding.date
-        private val capturesText = binding.captures
+        private val size = binding.size
         private val context = binding.root.context
+        private val dateFormat = SimpleDateFormat("dd/MM/yyyy")
 
-        fun bind(filename: String) {
-            val split = filename.split("#")
-            if (split.size >= 3) {
-                capturesText.text = split[split.lastIndex]
-                dateText.text = Date(split[split.lastIndex-1].toLong()).toString()
-                var txt = ""
-                for (i in 0 until split.size-2) {
-                    txt += split[i]
-                }
-                titleText.text = txt
-            } else {
-                titleText.text = filename
-            }
+        fun bind(file: File) {
+            titleText.text = file.name
+            dateText.text = dateFormat.format(Date(file.lastModified()))
+            size.text = Storage.sizeBytesPrettyString(file.length())
 
             itemView.setOnClickListener {
                 Log.d(TAG, "click item")
                 val intentShareFile = Intent(Intent.ACTION_SEND)
-                val filepath = context.applicationContext.filesDir.toString()+"/"+filename
-                val file = File(filepath)
 
                 if (file.exists()) {
                     Log.d(TAG, "File exists")
@@ -61,7 +53,7 @@ class HistoryListAdapter(private val fileList: Array<String>) :
                     }
                     context.startActivity(intentShareFile)
                 } else {
-                    Log.d(TAG, "File in $filepath doesn't exist")
+                    Log.d(TAG, "File doesn't exist")
                 }
             }
         }
