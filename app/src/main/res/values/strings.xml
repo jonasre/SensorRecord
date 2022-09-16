@@ -58,6 +58,10 @@
         <b>Thank you!</b>]]>
     </string>
     <string name="set_title">Please set a title</string>
+    <string name="start_recording">Start recording</string>
+    <string name="title">Title</string>
+    <string name="add_marker">ADD MARKER</string>
+    <string name="stop">STOP</string>
     <string-array name="markers">
         <item>Pushback</item>
         <item>Taxi</item>
