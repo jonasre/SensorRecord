@@ -1,9 +1,11 @@
 package no.uio.ifi.jonaspr.sensorrecord.ui.history
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import no.uio.ifi.jonaspr.sensorrecord.data.Storage
@@ -12,7 +14,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-class HistoryListAdapter(private val fileList: List<File>) :
+class HistoryListAdapter(var fileList: List<File>) :
     RecyclerView.Adapter<HistoryListAdapter.ViewHolder>() {
 
     /**
@@ -36,7 +38,6 @@ class HistoryListAdapter(private val fileList: List<File>) :
                 val intentShareFile = Intent(Intent.ACTION_SEND)
 
                 if (file.exists()) {
-                    Log.d(TAG, "File exists")
                     intentShareFile.apply {
                         type = "application/pdf"
                         flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -53,8 +54,32 @@ class HistoryListAdapter(private val fileList: List<File>) :
                     }
                     context.startActivity(intentShareFile)
                 } else {
-                    Log.d(TAG, "File doesn't exist")
+                    Log.w(TAG, "Tried sharing nonexistent file")
                 }
+            }
+
+            itemView.setOnLongClickListener {
+                AlertDialog.Builder(context).apply {
+                    setTitle("Confirm delete")
+                    setMessage("Are you sure you want to delete '${file.name}'? This action can not be undone.")
+                    setPositiveButton("Delete") { _, _ ->
+                        if (file.exists()) {
+                            if (!file.delete()) {
+                                Toast.makeText(context, "Error deleting", Toast.LENGTH_SHORT).show()
+
+                            }
+                            else {
+                                Toast.makeText(context, "File deleted", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        fileList = Storage.getAllZipFiles()
+                        this@HistoryListAdapter.notifyDataSetChanged()
+                    }
+                    setNegativeButton("Cancel") { _, _ ->
+                        Log.d(TAG, "Aborted deletion")
+                    }
+                }.show()
+                return@setOnLongClickListener true
             }
         }
 

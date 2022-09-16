@@ -107,7 +107,7 @@ object Storage {
         }
         Log.d(TAG, "Found ${fileList?.size} files")
 
-        return fileList?.map { File(parent, it) }!!
+        return fileList?.map { File(parent, it) }!!.asReversed()
     }
 
     fun sizeBytesPrettyString(bytes: Long) : String {
