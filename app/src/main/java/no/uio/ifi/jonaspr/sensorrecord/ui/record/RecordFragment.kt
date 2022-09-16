@@ -2,6 +2,7 @@
 
 package no.uio.ifi.jonaspr.sensorrecord.ui.record
 
+import android.app.Activity
 import android.app.ActivityManager
 import android.app.AlertDialog
 import android.content.Context
@@ -16,6 +17,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toFile
 import androidx.core.view.isVisible
 import androidx.core.view.size
 import androidx.fragment.app.Fragment
@@ -23,6 +27,7 @@ import androidx.lifecycle.ViewModelProvider
 import no.uio.ifi.jonaspr.sensorrecord.R
 import no.uio.ifi.jonaspr.sensorrecord.databinding.FragmentRecordBinding
 import no.uio.ifi.jonaspr.sensorrecord.recordservice.RecordService
+import java.io.File
 import java.text.DateFormat
 
 
@@ -36,6 +41,7 @@ class RecordFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var service: RecordService? = null
+    private lateinit var testFilePickerLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,6 +60,32 @@ class RecordFragment : Fragment() {
 
         if (recordViewModel.hasSensor(root.context, Sensor.TYPE_PRESSURE)) {
             _binding!!.captureCount.visibility = View.VISIBLE
+        }
+
+        testFilePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                recordViewModel.testFileUri().postValue(result.data?.data)
+            }
+        }
+
+        _binding!!.testFileButton.setOnClickListener {
+            testFilePickerLauncher.launch(Intent().apply {
+                type = "*/*"
+                action = Intent.ACTION_GET_CONTENT
+            })
+        }
+
+        _binding!!.testFileButton.setOnLongClickListener {
+            recordViewModel.testFileUri().postValue(null)
+            return@setOnLongClickListener true
+        }
+
+        recordViewModel.testFileUri().observe(viewLifecycleOwner) {
+            if (it == null) {
+                _binding!!.testFileButton.text = "Use test file"
+            } else {
+                _binding!!.testFileButton.text = it.path?.let { it1 -> File(it1).name }
+            }
         }
 
         _binding!!.startButton.setOnClickListener {

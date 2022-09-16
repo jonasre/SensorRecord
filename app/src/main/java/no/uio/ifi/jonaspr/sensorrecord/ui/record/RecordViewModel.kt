@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.hardware.Sensor
 import android.hardware.SensorManager
+import android.net.Uri
 import android.os.IBinder
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,9 +14,14 @@ import no.uio.ifi.jonaspr.sensorrecord.recordservice.RecordService
 
 class RecordViewModel : ViewModel() {
     private var mBinder =  MutableLiveData<RecordService.LocalBinder?>()
+    private var mTestFileUri = MutableLiveData<Uri?>()
 
     fun binder() : MutableLiveData<RecordService.LocalBinder?> {
         return mBinder
+    }
+
+    fun testFileUri() : MutableLiveData<Uri?> {
+        return mTestFileUri
     }
 
     private val connection = object : ServiceConnection {
@@ -42,6 +48,7 @@ class RecordViewModel : ViewModel() {
                 putExtra("title", title)
                 putExtra("accelerometer", accelerometer)
                 putExtra("barometer", barometer)
+                putExtra("testFileUri", mTestFileUri.value)
             }
 
             // Start the recording service

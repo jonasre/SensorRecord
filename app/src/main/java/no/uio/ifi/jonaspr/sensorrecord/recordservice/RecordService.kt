@@ -8,6 +8,7 @@ import android.app.AlarmManager.RTC_WAKEUP
 import android.hardware.Sensor
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import android.os.PowerManager
@@ -43,9 +44,9 @@ class RecordService : Service() {
     private lateinit var pendingIntent : PendingIntent
     private lateinit var wakeLock : PowerManager.WakeLock
 
-    private var injectSensorData: Boolean = false
     private var useAccelerometer: Boolean = true
     private var useBarometer: Boolean = true
+    private var testFileUri: Uri? = null
 
 
     private val _running = MutableLiveData(false)
@@ -65,13 +66,14 @@ class RecordService : Service() {
         val title = intent?.getStringExtra("title") as String
         useAccelerometer = intent.getBooleanExtra("accelerometer", true)
         useBarometer = intent.getBooleanExtra("barometer", true)
-        injectSensorData = intent.getBooleanExtra("injectSensorData", false)
+        testFileUri = intent.getParcelableExtra("testFileUri")
         dataObject = SensorRecording(title, delay)
 
         // Use CustomSensorManager if sensor data should be injected,
         // else use default SensorManager
-        sensorManager = if (injectSensorData) {
-            CustomSensorManager()
+        sensorManager = if (testFileUri != null) {
+            val l = contentResolver.openInputStream(testFileUri!!)!!.bufferedReader().readLines()
+            CustomSensorManager(getSystemService(Context.SENSOR_SERVICE) as SensorManager, l)
         } else {
             SensorManagerWrapper(getSystemService(Context.SENSOR_SERVICE) as SensorManager)
         }
