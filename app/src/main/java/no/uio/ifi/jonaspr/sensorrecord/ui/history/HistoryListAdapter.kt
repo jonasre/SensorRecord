@@ -1,21 +1,17 @@
 package no.uio.ifi.jonaspr.sensorrecord.ui.history
 
 import android.content.Intent
-import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import no.uio.ifi.jonaspr.sensorrecord.databinding.HistoryItemBinding
 import java.io.File
-import java.time.LocalDateTime
 import java.util.*
 
 class HistoryListAdapter(private val fileList: Array<String>) :
     RecyclerView.Adapter<HistoryListAdapter.ViewHolder>() {
-    private val TAG = "HistoryListAdapter"
 
     /**
      * Provide a reference to the type of views that you are using
@@ -96,5 +92,9 @@ class HistoryListAdapter(private val fileList: Array<String>) :
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = fileList.size
+
+    companion object {
+        private const val TAG = "HistoryListAdapter"
+    }
 
 }
