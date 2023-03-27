@@ -12,11 +12,13 @@ data class SensorRecording(val title: String, val delay: Int) {
     //val dataList: ArrayList<String> = ArrayList()
     private val markers: ArrayList<Pair<String, Long>> = ArrayList()
     private val startTime: Long = SystemClock.elapsedRealtimeNanos()/1_000_000
+    var samples = 0
     val file = Storage.createFile(title)
     var flushActive = false
 
 
     fun addData(s: String) {
+        samples++
         dataString += s+"\n"
 
         if (dataString.length > MAX_SIZE_STRING) {

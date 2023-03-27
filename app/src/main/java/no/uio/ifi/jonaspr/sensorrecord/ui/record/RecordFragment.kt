@@ -218,8 +218,29 @@ class RecordFragment : Fragment() {
     }
 
     private fun stop(viewModel: RecordViewModel) {
+        val dialogView = View.inflate(context, R.layout.dialog_saving_file, null)
+        val progressBar = dialogView.findViewById<ProgressBar>(R.id.savingProgressBar)
+        val statusText = dialogView.findViewById<TextView>(R.id.savingState)
+        Storage.status.observe(viewLifecycleOwner) {
+            progressBar.visibility = if (it == "Writing sensor data to file...")
+                View.VISIBLE else View.GONE
+            statusText.text = it
+        }
+        val title = binding.titleInput.text.toString()
+        val loadingDialog = AlertDialog.Builder(activity).run {
+            setView(dialogView)
+            setCancelable(false)
+            setOnDismissListener {
+                Toast.makeText(
+                    activity,
+                    "Recording \"${title}\" saved",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            show()
+        }
         if (service != null) {
-            service!!.stop()
+            service!!.stop(loadingDialog)
             viewModel.unbindService(context)
             service = null
         }

@@ -13,10 +13,7 @@ import android.os.PowerManager
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import no.uio.ifi.jonaspr.sensorrecord.*
 import no.uio.ifi.jonaspr.sensorrecord.data.SensorRecording
 import no.uio.ifi.jonaspr.sensorrecord.data.Storage
@@ -168,7 +165,7 @@ class RecordService : Service() {
         startForeground(notificationID, notification)
     }
 
-    fun stop() {
+    fun stop(loadingDialog: AlertDialog? = null) {
         Log.d(TAG, "Stop signal received")
         _running.postValue(false)
         sensorManager.unregisterListener(listener)
@@ -181,7 +178,17 @@ class RecordService : Service() {
 
         // Save recording to file
         CoroutineScope(Dispatchers.IO).launch {
-            Storage.buildFinalFile(dataObject)
+            wakeLock = (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+                newWakeLock(
+                    PowerManager.PARTIAL_WAKE_LOCK,
+                    "SensorRecord::SaveFileWakeLock"
+                ).apply {
+                    acquire(60*1000L) // 1 minute timeout
+                }
+            }
+            Storage.buildFinalFile(dataObject, loadingDialog?.findViewById(R.id.savingProgressBar))
+            loadingDialog?.dismiss()
+            wakeLock.release()
         }
 
     }

@@ -2,6 +2,9 @@ package no.uio.ifi.jonaspr.sensorrecord.data
 
 import android.content.Context
 import android.util.Log
+import android.widget.ProgressBar
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import java.io.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -10,6 +13,8 @@ object Storage {
     private const val TAG = "STORAGE"
     private lateinit var path : File
     private val UNITS = arrayOf("B", "kB", "MB", "GB", "TB")
+    private val mStatus = MutableLiveData("")
+    val status: LiveData<String> = mStatus
 
     fun initialize(context: Context) {
         path = context.applicationContext.filesDir
@@ -28,13 +33,15 @@ object Storage {
         writer.close()
     }
 
-    fun buildFinalFile(sr: SensorRecording) {
+    fun buildFinalFile(sr: SensorRecording, progressBar: ProgressBar? = null) {
         // Wait until flush is complete
+        mStatus.postValue("Getting final samples...")
         while (sr.flushActive) {
             Thread.sleep(100)
             Log.d(TAG, "Waiting for flush to complete")
         }
 
+        mStatus.postValue("Writing headers and markers...")
         Log.d(TAG, "Writing headers and markers")
         // Create writer
         val newFile = File(path, "${sr.title}.txt")
@@ -42,6 +49,7 @@ object Storage {
         // Write headers and markers
         writer.write(sr.headerMarkerString().toByteArray())
 
+        mStatus.postValue("Writing sensor data to file...")
         Log.d(TAG, "Writing sensor data to new file")
         // Create reader
         val reader = BufferedReader(FileReader(sr.file))
@@ -52,6 +60,7 @@ object Storage {
             x++
             writer.write("$line\n".toByteArray())
             line = reader.readLine()
+            progressBar?.progress = ((x / sr.samples.toFloat()) * 100).toInt()
         }
 
         // Close writer and reader
@@ -62,6 +71,7 @@ object Storage {
         sr.file.delete()
 
         // Compress the new file
+        mStatus.postValue("Compressing...")
         zipFile(newFile, sr.title)
 
         // Delete uncompressed file
