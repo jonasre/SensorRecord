@@ -70,6 +70,8 @@ class RecordFragment : Fragment() {
                         setNegativeButton("No") {_, _ -> }
                         show()
                     }
+                } else {
+                    startRecording(title)
                 }
             }
         }
