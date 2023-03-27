@@ -73,7 +73,7 @@ class HistoryListAdapter(var fileList: List<File>) :
                             }
                         }
                         fileList = Storage.getAllZipFiles()
-                        this@HistoryListAdapter.notifyDataSetChanged()
+                        notifyItemRemoved(layoutPosition)
                     }
                     setNegativeButton("Cancel") { _, _ ->
                         Log.d(TAG, "Aborted deletion")
