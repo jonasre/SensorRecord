@@ -9,7 +9,6 @@ import android.content.Intent
 import android.hardware.Sensor
 import android.os.Bundle
 import android.os.SystemClock
-import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,7 +16,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.view.isVisible
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import no.uio.ifi.jonaspr.sensorrecord.R
@@ -74,6 +72,8 @@ class RecordFragment : Fragment() {
                         setPositiveButton("Ok") { _, _ -> }
                     }
                     builder?.show()
+                } else if (recordViewModel.hasSensor(root.context, Sensor.TYPE_PRESSURE)) {
+                    _binding!!.captureCount.visibility = View.VISIBLE
                 }
             }
         }
@@ -88,6 +88,8 @@ class RecordFragment : Fragment() {
                 setPositiveButton("Yes") { _, _ ->
                     Log.d(TAG, "Dialog OK")
                     stop(recordViewModel)
+                    binding.titleInput.setText("")
+                    binding.captureCount.visibility = View.INVISIBLE
                 }
                 setNegativeButton("No") { _, _ ->
                     Log.d(TAG, "Dialog CANCEL")
