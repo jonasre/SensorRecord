@@ -62,6 +62,8 @@
     <string name="title">Title</string>
     <string name="add_marker">ADD MARKER</string>
     <string name="stop">STOP</string>
+    <string name="recording_already_exists">A recording with this title already exists. Would you like to overwrite it?</string>
+    <string name="name_collision">Name collision</string>
     <string-array name="markers">
         <item>Pushback</item>
         <item>Taxi</item>

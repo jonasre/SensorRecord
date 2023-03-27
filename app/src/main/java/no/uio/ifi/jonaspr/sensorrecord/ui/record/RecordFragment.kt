@@ -19,6 +19,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import no.uio.ifi.jonaspr.sensorrecord.R
+import no.uio.ifi.jonaspr.sensorrecord.data.Storage
 import no.uio.ifi.jonaspr.sensorrecord.databinding.FragmentRecordBinding
 import no.uio.ifi.jonaspr.sensorrecord.recordservice.RecordService
 import java.text.DateFormat
@@ -61,19 +62,14 @@ class RecordFragment : Fragment() {
                     _binding!!.titleInput.error = getString(R.string.set_title)
                     return@setOnClickListener
                 }
-                val serviceStarted = recordViewModel.startRecordingService(context, title)
-                if (!serviceStarted) {
-                    val builder: AlertDialog.Builder? = activity?.let { fragment ->
-                        AlertDialog.Builder(fragment)
+                if (Storage.checkZipFileExists(title)) {
+                    AlertDialog.Builder(activity).apply {
+                        setTitle(getString(R.string.name_collision))
+                        setMessage(getString(R.string.recording_already_exists))
+                        setPositiveButton("Yes") { _, _ -> startRecording(title)}
+                        setNegativeButton("No") {_, _ -> }
+                        show()
                     }
-                    builder?.apply {
-                        setTitle("Error: Sensors not found")
-                        setMessage(getString(R.string.no_sensor_error))
-                        setPositiveButton("Ok") { _, _ -> }
-                    }
-                    builder?.show()
-                } else if (recordViewModel.hasSensor(root.context, Sensor.TYPE_PRESSURE)) {
-                    _binding!!.captureCount.visibility = View.VISIBLE
                 }
             }
         }
@@ -184,6 +180,20 @@ class RecordFragment : Fragment() {
             _binding!!.startButton.isEnabled = true
         }
         return root
+    }
+
+    private fun startRecording(title: String) {
+        val serviceStarted = recordViewModel.startRecordingService(context, title)
+        if (!serviceStarted) {
+            AlertDialog.Builder(activity).apply {
+                setTitle("Error: Sensors not found")
+                setMessage(getString(R.string.no_sensor_error))
+                setPositiveButton("Ok") { _, _ -> }
+                show()
+            }
+        } else if (recordViewModel.hasSensor(activity, Sensor.TYPE_PRESSURE)) {
+            _binding!!.captureCount.visibility = View.VISIBLE
+        }
     }
 
     private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {

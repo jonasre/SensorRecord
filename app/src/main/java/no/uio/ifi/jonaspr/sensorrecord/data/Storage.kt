@@ -110,7 +110,7 @@ object Storage {
         return fileList?.map { File(parent, it) }!!.asReversed()
     }
 
-    fun sizeBytesPrettyString(bytes: Long) : String {
+    fun sizeBytesPrettyString(bytes: Long): String {
         var asDouble = bytes.toDouble()
         var unitIndex = 0
         while (asDouble > 1024) {
@@ -118,6 +118,14 @@ object Storage {
             unitIndex++
         }
         return "${String.format("%.2f", asDouble)} ${UNITS[unitIndex]}"
+    }
+
+    fun checkZipFileExists(title: String): Boolean {
+        val t = "${title.lowercase()}.zip"
+        for (f in getAllZipFiles()) {
+            if (f.name.lowercase() == t) return true
+        }
+        return false
     }
 
 
