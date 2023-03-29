@@ -2,8 +2,8 @@
     <string name="app_name">SensorRecord</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_title">SensorRecord</string>
+    <string name="nav_header_subtitle">A data collection app for flights</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
@@ -64,6 +64,8 @@
     <string name="stop">STOP</string>
     <string name="recording_already_exists">A recording with this title already exists. Would you like to overwrite it?</string>
     <string name="name_collision">Name collision</string>
+    <string name="record">Record</string>
+    <string name="history">History</string>
     <string-array name="markers">
         <item>Pushback</item>
         <item>Taxi</item>
