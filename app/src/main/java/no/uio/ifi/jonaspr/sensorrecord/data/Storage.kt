@@ -100,15 +100,6 @@ object Storage {
         fos.close()
     }
 
-    /*fun saveSensorRecording(sr : SensorRecording) {
-        Log.d(TAG, "Writing to file")
-        val filename = sr.title + "#" + sr.startTime + "#" + sr.dataList.size + ".txt"
-        Log.d(TAG, "File path: $path")
-        val writer = FileOutputStream(File(path, filename))
-        writer.write(sr.toFileString().toByteArray())
-        writer.close()
-    }*/
-
     fun getAllZipFiles(): List<File> {
         Log.d(TAG, "Getting all files from directory")
         val parent = File(path.toString())
@@ -137,6 +128,4 @@ object Storage {
         }
         return false
     }
-
-
 }
