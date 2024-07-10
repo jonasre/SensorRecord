@@ -108,7 +108,7 @@ object Storage {
         }
         Log.d(TAG, "Found ${fileList?.size} files")
 
-        return fileList?.map { File(parent, it) }!!.sortedDescending()
+        return fileList?.map { File(parent, it) }!!.sortedBy { it.lastModified() }.reversed()
     }
 
     fun sizeBytesPrettyString(bytes: Long): String {

@@ -1,5 +1,6 @@
 package no.uio.ifi.jonaspr.sensorrecord.recordservice
 
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
@@ -40,7 +41,7 @@ class RecordService : Service() {
     private lateinit var wakeLock : PowerManager.WakeLock
 
     private var useAccelerometer: Boolean = true
-    var useBarometer: Boolean = true
+    private var useBarometer: Boolean = true
 
 
     private val _running = MutableLiveData(false)
@@ -55,6 +56,7 @@ class RecordService : Service() {
         return binder
     }
 
+    @SuppressLint("WakelockTimeout")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "RecordService starting")
         val title = intent?.getStringExtra("title") as String
@@ -69,7 +71,7 @@ class RecordService : Service() {
             if (useBarometer) {
                 // Register listener for barometer
                 val pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
-                var maxReportLatency = (pressureSensor.fifoMaxEventCount/barometerSamplingFrequencyHz)*1_000_000
+                var maxReportLatency = (pressureSensor!!.fifoMaxEventCount/barometerSamplingFrequencyHz)*1_000_000
                 if (maxReportLatency < 0) maxReportLatency = Int.MAX_VALUE //integer overflow protection
                 val barometerBatching = sensorManager.registerListener(
                     listener,
@@ -87,7 +89,7 @@ class RecordService : Service() {
             if (useAccelerometer) {
                 // Register listener for accelerometer
                 val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-                var maxReportLatency = (accelerometer.fifoMaxEventCount/accelerometerSamplingFrequencyHz)*1_000_000
+                var maxReportLatency = (accelerometer!!.fifoMaxEventCount/accelerometerSamplingFrequencyHz)*1_000_000
                 if (maxReportLatency < 0) maxReportLatency = Int.MAX_VALUE //integer overflow protection
                 val accelerometerBatching = sensorManager.registerListener(
                     listener,
