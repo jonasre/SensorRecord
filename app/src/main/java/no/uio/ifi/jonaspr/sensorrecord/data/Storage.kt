@@ -6,6 +6,7 @@ import android.widget.ProgressBar
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import java.io.*
+import java.util.Locale
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
@@ -118,7 +119,7 @@ object Storage {
             asDouble /= 1024
             unitIndex++
         }
-        return "${String.format("%.2f", asDouble)} ${UNITS[unitIndex]}"
+        return "${String.format(Locale.ROOT, "%.2f", asDouble)} ${UNITS[unitIndex]}"
     }
 
     fun checkZipFileExists(title: String): Boolean {
