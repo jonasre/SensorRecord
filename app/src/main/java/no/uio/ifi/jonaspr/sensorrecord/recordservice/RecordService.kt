@@ -71,16 +71,12 @@ class RecordService : Service() {
             if (useBarometer) {
                 // Register listener for barometer
                 val pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
-                var maxReportLatency = (pressureSensor!!.fifoMaxEventCount/barometerSamplingFrequencyHz)*1_000_000
-                if (maxReportLatency < 0) maxReportLatency = Int.MAX_VALUE //integer overflow protection
                 val barometerBatching = sensorManager.registerListener(
                     listener,
                     pressureSensor,
-                    barometerSamplingFrequency,
-                    maxReportLatency
+                    barometerSamplingFrequency
                 )
-                Log.d(TAG, "MaxReportLatency for barometer: $maxReportLatency")
-                Log.d(TAG, "Barometer is wakeupSensor: ${pressureSensor.isWakeUpSensor}")
+
                 // Log if batching isn't available
                 if (!barometerBatching)
                     Log.w(TAG, "Batching for barometer not available")
@@ -89,21 +85,17 @@ class RecordService : Service() {
             if (useAccelerometer) {
                 // Register listener for accelerometer
                 val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-                var maxReportLatency = (accelerometer!!.fifoMaxEventCount/accelerometerSamplingFrequencyHz)*1_000_000
-                if (maxReportLatency < 0) maxReportLatency = Int.MAX_VALUE //integer overflow protection
                 val accelerometerBatching = sensorManager.registerListener(
                     listener,
                     accelerometer,
                     accelerometerSamplingFrequency,
-                    maxReportLatency
+                    1_000_000 // 1 second
                 )
-                Log.d(TAG, "MaxReportLatency for accelerometer: $maxReportLatency")
-                Log.d(TAG, "Accelerometer is wakeupSensor: ${accelerometer.isWakeUpSensor}")
+
                 // Log if batching isn't available
                 if (!accelerometerBatching)
                     Log.w(TAG, "Batching for accelerometer not available")
             }
-
 
             // Start foreground service
             _running.postValue(true)
@@ -127,8 +119,6 @@ class RecordService : Service() {
                 acquire()
             }
         }
-
-
 
         return START_REDELIVER_INTENT
     }

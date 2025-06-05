@@ -20,7 +20,7 @@ class CustomSensorEventListener(
             Sensor.TYPE_PRESSURE -> {
                 dataObject.addData("$t:${v[0]}")
                 pressure.postValue(v[0])
-                //Log.d(TAG, "SensorEvent PRESSURE: $t@${v[0]}")
+                Log.d(TAG, "SensorEvent PRESSURE: $t@${v[0]}")
             }
             // Accelerometer data
             Sensor.TYPE_ACCELEROMETER -> {
